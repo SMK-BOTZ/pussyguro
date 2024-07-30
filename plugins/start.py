@@ -1,3 +1,5 @@
+#(©)CodeXBotz
+
 import os
 import asyncio
 from pyrogram import Client, filters, __version__
@@ -10,7 +12,9 @@ from config import ADMINS, FORCE_MSG, START_MSG, CUSTOM_CAPTION, DISABLE_CHANNEL
 from helper_func import subscribed, encode, decode, get_messages
 from database.database import add_user, del_user, full_userbase, present_user
 
-DELETE_TIMEOUT = 600  # 10 minutes in seconds
+"""Add time in seconds for waiting before delete 
+1min = 60, 2min = 60*2 = 120, 5min = 60*5 = 300"""
+SECONDS = int(os.getenv("SECONDS", "600"))
 
 @Bot.on_message(filters.command('start') & filters.private & subscribed)
 async def start_command(client: Client, message: Message):
@@ -35,7 +39,7 @@ async def start_command(client: Client, message: Message):
             except:
                 return
             if start <= end:
-                ids = range(start, end + 1)
+                ids = range(start, end+1)
             else:
                 ids = []
                 i = start
@@ -57,7 +61,8 @@ async def start_command(client: Client, message: Message):
             return
         await temp_msg.delete()
 
-        sent_messages = []
+        snt_msgs = []
+
         for msg in messages:
             if bool(CUSTOM_CAPTION) & bool(msg.document):
                 caption = CUSTOM_CAPTION.format(previouscaption="" if not msg.caption else msg.caption.html, filename=msg.document.file_name)
@@ -70,47 +75,26 @@ async def start_command(client: Client, message: Message):
                 reply_markup = None
 
             try:
-                sent_msg = await msg.copy(chat_id=message.from_user.id, caption=caption, parse_mode=ParseMode.HTML, reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
+                snt_msg = await msg.copy(chat_id=message.from_user.id, caption=caption, parse_mode=ParseMode.HTML, reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
                 await asyncio.sleep(0.5)
-                sent_messages.append(sent_msg.message_id)
+                snt_msgs.append(snt_msg)
             except FloodWait as e:
                 await asyncio.sleep(e.x)
-                sent_msg = await msg.copy(chat_id=message.from_user.id, caption=caption, parse_mode=ParseMode.HTML, reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
-                await asyncio.sleep(0.5)
-                sent_messages.append(sent_msg.message_id)
+                snt_msg = await msg.copy(chat_id=message.from_user.id, caption=caption, parse_mode=ParseMode.HTML, reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
+                snt_msgs.append(snt_msg)
             except:
                 pass
 
-        if sent_messages:
-            await message.reply_text(
-                text="Files will be deleted in 10 minutes.\nForward to saved messages before downloading.",
-                quote=True
-            )
+        await message.reply_text("Files will be deleted in 10 minutes.\nForward to saved messages before downloading")
+        await asyncio.sleep(SECONDS)
 
-            await asyncio.sleep(DELETE_TIMEOUT)
+        for snt_msg in snt_msgs:
+            try:
+                await snt_msg.delete()
+            except:
+                pass
 
-            for msg_id in sent_messages:
-                try:
-                    await client.delete_messages(chat_id=message.from_user.id, message_ids=msg_id)
-                except:
-                    pass
-
-            retrieve_button = InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton("Retrieve File", callback_data=f"retrieve_{id}")
-                    ]
-                ]
-            )
-
-            await message.reply_text(
-                text="Your Video/File is Deleted. Click on the below button to get files again",
-                reply_markup=retrieve_button,
-                quote=True
-            )
-
-            # Store the sent messages for retrieval
-            client.sent_files[id] = sent_messages
+        await message.reply_text("Files have been deleted.\nClick the button below to retrieve the files again.", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Retrieve Files", callback_data=f"retrieve_{message.from_user.id}")]]))
         return
     else:
         reply_markup = InlineKeyboardMarkup(
@@ -135,35 +119,27 @@ async def start_command(client: Client, message: Message):
         )
         return
 
-@Bot.on_callback_query(filters.regex(r"^retrieve_"))
+#=====================================================================================##
+
+WAIT_MSG = """"<b>Processing ...</b>"""
+
+REPLY_ERROR = """<code>Use this command as a replay to any telegram message with out any spaces.</code>"""
+
+#=====================================================================================##
+
+
+@Bot.on_callback_query(filters.regex(r"retrieve_(\d+)"))
 async def retrieve_files(client: Client, callback_query: CallbackQuery):
     user_id = int(callback_query.data.split("_")[1])
-    if user_id in client.sent_files:
-        sent_messages = client.sent_files[user_id]
-        for msg_id in sent_messages:
-            try:
-                await client.copy_message(
-                    chat_id=callback_query.message.chat.id,
-                    from_chat_id=callback_query.message.chat.id,
-                    message_id=msg_id,
-                )
-                await asyncio.sleep(0.5)
-            except:
-                pass
-        await callback_query.answer("Files have been resent.", show_alert=True)
-    else:
-        await callback_query.answer("No files found to retrieve.", show_alert=True)
-
-WAIT_MSG = """<b>Processing ...</b>"""
-REPLY_ERROR = """<code>Use this command as a replay to any telegram message without any spaces.</code>"""
+    if callback_query.from_user.id == user_id:
+        await callback_query.message.delete()
+        await start_command(client, callback_query.message)
 
 @Bot.on_message(filters.command('start') & filters.private)
 async def not_joined(client: Client, message: Message):
     buttons = [
         [
-            InlineKeyboardButton(
-                "Join Channel",
-                url=client.invitelink)
+            InlineKeyboardButton("Join Channel", url=client.invitelink)
         ]
     ]
     try:
@@ -207,7 +183,7 @@ async def send_text(client: Bot, message: Message):
         blocked = 0
         deleted = 0
         unsuccessful = 0
-        
+
         pls_wait = await message.reply("<i>Broadcasting Message.. This will Take Some Time</i>")
         for chat_id in query:
             try:
@@ -227,7 +203,7 @@ async def send_text(client: Bot, message: Message):
                 unsuccessful += 1
                 pass
             total += 1
-        
+
         status = f"""<b><u>Broadcast Completed</u>
 
 Total Users: <code>{total}</code>
@@ -235,7 +211,7 @@ Successful: <code>{successful}</code>
 Blocked Users: <code>{blocked}</code>
 Deleted Accounts: <code>{deleted}</code>
 Unsuccessful: <code>{unsuccessful}</code></b>"""
-        
+
         return await pls_wait.edit(status)
 
     else:
