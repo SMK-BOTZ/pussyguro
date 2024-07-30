@@ -10,7 +10,7 @@ from config import ADMINS, FORCE_MSG, START_MSG, CUSTOM_CAPTION, DISABLE_CHANNEL
 from helper_func import subscribed, encode, decode, get_messages
 from database.database import add_user, del_user, full_userbase, present_user
 
-DELETE_TIMEOUT = 60  # 10 minutes in seconds
+DELETE_TIMEOUT = 30  # 10 minutes in seconds
 
 @Bot.on_message(filters.command('start') & filters.private & subscribed)
 async def start_command(client: Client, message: Message):
@@ -57,7 +57,7 @@ async def start_command(client: Client, message: Message):
             return
         await temp_msg.delete()
 
-        notification_sent = False
+        sent_messages = []
         for msg in messages:
             if bool(CUSTOM_CAPTION) & bool(msg.document):
                 caption = CUSTOM_CAPTION.format(previouscaption="" if not msg.caption else msg.caption.html, filename=msg.document.file_name)
@@ -71,27 +71,34 @@ async def start_command(client: Client, message: Message):
 
             try:
                 sent_msg = await msg.copy(chat_id=message.from_user.id, caption=caption, parse_mode=ParseMode.HTML, reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
-                if not notification_sent:
-                    await message.reply_text(
-                        text="Files will be deleted in 10 minutes. Forward to saved messages before downloading.",
-                        quote=True
-                    )
-                    notification_sent = True
                 await asyncio.sleep(0.5)
                 asyncio.create_task(delete_after_timeout(client, sent_msg))
+                sent_messages.append(sent_msg.message_id)
             except FloodWait as e:
                 await asyncio.sleep(e.x)
                 sent_msg = await msg.copy(chat_id=message.from_user.id, caption=caption, parse_mode=ParseMode.HTML, reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
-                if not notification_sent:
-                    await message.reply_text(
-                        text="Files will be deleted in 10 minutes. Forward to saved messages before downloading.",
-                        quote=True
-                    )
-                    notification_sent = True
                 await asyncio.sleep(0.5)
                 asyncio.create_task(delete_after_timeout(client, sent_msg))
+                sent_messages.append(sent_msg.message_id)
             except:
                 pass
+
+        retrieve_button = InlineKeyboardMarkup(
+            [
+                [
+                    InlineKeyboardButton("Retrieve File", callback_data=f"retrieve_{id}")
+                ]
+            ]
+        )
+
+        await message.reply_text(
+            text="Files will be deleted in 10 minutes. Forward to saved messages before downloading.",
+            reply_markup=retrieve_button,
+            quote=True
+        )
+
+        # Store the sent messages for retrieval
+        client.sent_files[id] = sent_messages
         return
     else:
         reply_markup = InlineKeyboardMarkup(
@@ -119,6 +126,25 @@ async def start_command(client: Client, message: Message):
 async def delete_after_timeout(client: Client, message: Message):
     await asyncio.sleep(DELETE_TIMEOUT)
     await message.delete()
+
+@Bot.on_callback_query(filters.regex(r"^retrieve_"))
+async def retrieve_files(client: Client, callback_query: CallbackQuery):
+    user_id = int(callback_query.data.split("_")[1])
+    if user_id in client.sent_files:
+        sent_messages = client.sent_files[user_id]
+        for msg_id in sent_messages:
+            try:
+                await client.copy_message(
+                    chat_id=callback_query.message.chat.id,
+                    from_chat_id=callback_query.message.chat.id,
+                    message_id=msg_id,
+                )
+                await asyncio.sleep(0.5)
+            except:
+                pass
+        await callback_query.answer("Files have been resent.", show_alert=True)
+    else:
+        await callback_query.answer("No files found to retrieve.", show_alert=True)
 
 WAIT_MSG = """<b>Processing ...</b>"""
 REPLY_ERROR = """<code>Use this command as a replay to any telegram message without any spaces.</code>"""
