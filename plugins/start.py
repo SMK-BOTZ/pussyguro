@@ -10,7 +10,7 @@ from config import ADMINS, FORCE_MSG, START_MSG, CUSTOM_CAPTION, DISABLE_CHANNEL
 from helper_func import subscribed, encode, decode, get_messages
 from database.database import add_user, del_user, full_userbase, present_user
 
-DELETE_DELAY = 600  # Time in seconds (10 minutes)
+DELETE_TIMEOUT = 60  # 10 minutes in seconds
 
 @Bot.on_message(filters.command('start') & filters.private & subscribed)
 async def start_command(client: Client, message: Message):
@@ -57,10 +57,10 @@ async def start_command(client: Client, message: Message):
             return
         await temp_msg.delete()
 
+        notification_sent = False
         for msg in messages:
             if bool(CUSTOM_CAPTION) & bool(msg.document):
-                caption = CUSTOM_CAPTION.format(previouscaption="" if not msg.caption else msg.caption.html,
-                                                filename=msg.document.file_name)
+                caption = CUSTOM_CAPTION.format(previouscaption="" if not msg.caption else msg.caption.html, filename=msg.document.file_name)
             else:
                 caption = "" if not msg.caption else msg.caption.html
 
@@ -70,17 +70,26 @@ async def start_command(client: Client, message: Message):
                 reply_markup = None
 
             try:
-                sent_message = await msg.copy(chat_id=message.from_user.id, caption=caption, parse_mode=ParseMode.HTML,
-                                              reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
+                sent_msg = await msg.copy(chat_id=message.from_user.id, caption=caption, parse_mode=ParseMode.HTML, reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
+                if not notification_sent:
+                    await message.reply_text(
+                        text="Files will be deleted in 10 minutes. Forward to saved messages before downloading.",
+                        quote=True
+                    )
+                    notification_sent = True
                 await asyncio.sleep(0.5)
-                await notify_auto_delete(client, message.from_user.id)
-                asyncio.create_task(auto_delete_message(client, sent_message))
+                asyncio.create_task(delete_after_timeout(client, sent_msg))
             except FloodWait as e:
                 await asyncio.sleep(e.x)
-                sent_message = await msg.copy(chat_id=message.from_user.id, caption=caption, parse_mode=ParseMode.HTML,
-                                              reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
-                await notify_auto_delete(client, message.from_user.id)
-                asyncio.create_task(auto_delete_message(client, sent_message))
+                sent_msg = await msg.copy(chat_id=message.from_user.id, caption=caption, parse_mode=ParseMode.HTML, reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
+                if not notification_sent:
+                    await message.reply_text(
+                        text="Files will be deleted in 10 minutes. Forward to saved messages before downloading.",
+                        quote=True
+                    )
+                    notification_sent = True
+                await asyncio.sleep(0.5)
+                asyncio.create_task(delete_after_timeout(client, sent_msg))
             except:
                 pass
         return
@@ -107,46 +116,12 @@ async def start_command(client: Client, message: Message):
         )
         return
 
-async def notify_auto_delete(client: Client, user_id: int):
-    await client.send_message(
-        chat_id=user_id,
-        text="Files will be deleted in 10 minutes. Forward to saved messages before downloading."
-    )
+async def delete_after_timeout(client: Client, message: Message):
+    await asyncio.sleep(DELETE_TIMEOUT)
+    await message.delete()
 
-async def auto_delete_message(client: Client, message: Message):
-    await asyncio.sleep(DELETE_DELAY)
-    try:
-        await message.delete()
-        await client.send_message(
-            chat_id=message.chat.id,
-            text="This file has been deleted automatically after 10 minutes. Click the button below to retrieve the file again.",
-            reply_markup=InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton("Retrieve File", callback_data=f"retrieve_{message.message_id}")
-                    ]
-                ]
-            )
-        )
-    except:
-        pass
-
-@Bot.on_callback_query(filters.regex(r"^retrieve_(\d+)"))
-async def retrieve_file(client: Client, query: CallbackQuery):
-    message_id = int(query.data.split("_")[1])
-    try:
-        original_message = await client.get_messages(chat_id=query.message.chat.id, message_ids=message_id)
-        await original_message.copy(chat_id=query.message.chat.id)
-    except:
-        await query.answer("Failed to retrieve the file. It might have been permanently deleted.", show_alert=True)
-
-#=====================================================================================##
-
-WAIT_MSG = "<b>Processing ...</b>"
-
-REPLY_ERROR = "<code>Use this command as a reply to any telegram message without any spaces.</code>"
-
-#=====================================================================================##
+WAIT_MSG = """<b>Processing ...</b>"""
+REPLY_ERROR = """<code>Use this command as a replay to any telegram message without any spaces.</code>"""
 
 @Bot.on_message(filters.command('start') & filters.private)
 async def not_joined(client: Client, message: Message):
