@@ -73,11 +73,13 @@ async def start_command(client: Client, message: Message):
                 sent_message = await msg.copy(chat_id=message.from_user.id, caption=caption, parse_mode=ParseMode.HTML,
                                               reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
                 await asyncio.sleep(0.5)
+                await notify_auto_delete(client, message.from_user.id)
                 asyncio.create_task(auto_delete_message(client, sent_message))
             except FloodWait as e:
                 await asyncio.sleep(e.x)
                 sent_message = await msg.copy(chat_id=message.from_user.id, caption=caption, parse_mode=ParseMode.HTML,
                                               reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
+                await notify_auto_delete(client, message.from_user.id)
                 asyncio.create_task(auto_delete_message(client, sent_message))
             except:
                 pass
@@ -105,6 +107,11 @@ async def start_command(client: Client, message: Message):
         )
         return
 
+async def notify_auto_delete(client: Client, user_id: int):
+    await client.send_message(
+        chat_id=user_id,
+        text="Files will be deleted in 10 minutes. Forward to saved messages before downloading."
+    )
 
 async def auto_delete_message(client: Client, message: Message):
     await asyncio.sleep(DELETE_DELAY)
@@ -124,7 +131,6 @@ async def auto_delete_message(client: Client, message: Message):
     except:
         pass
 
-
 @Bot.on_callback_query(filters.regex(r"^retrieve_(\d+)"))
 async def retrieve_file(client: Client, query: CallbackQuery):
     message_id = int(query.data.split("_")[1])
@@ -134,7 +140,6 @@ async def retrieve_file(client: Client, query: CallbackQuery):
     except:
         await query.answer("Failed to retrieve the file. It might have been permanently deleted.", show_alert=True)
 
-
 #=====================================================================================##
 
 WAIT_MSG = "<b>Processing ...</b>"
@@ -142,7 +147,6 @@ WAIT_MSG = "<b>Processing ...</b>"
 REPLY_ERROR = "<code>Use this command as a reply to any telegram message without any spaces.</code>"
 
 #=====================================================================================##
-
 
 @Bot.on_message(filters.command('start') & filters.private)
 async def not_joined(client: Client, message: Message):
@@ -178,13 +182,11 @@ async def not_joined(client: Client, message: Message):
         disable_web_page_preview=True
     )
 
-
 @Bot.on_message(filters.command('users') & filters.private & filters.user(ADMINS))
 async def get_users(client: Bot, message: Message):
     msg = await client.send_message(chat_id=message.chat.id, text=WAIT_MSG)
     users = await full_userbase()
     await msg.edit(f"{len(users)} users are using this bot")
-
 
 @Bot.on_message(filters.private & filters.command('broadcast') & filters.user(ADMINS))
 async def send_text(client: Bot, message: Message):
