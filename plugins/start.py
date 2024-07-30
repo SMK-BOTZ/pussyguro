@@ -10,7 +10,7 @@ from config import ADMINS, FORCE_MSG, START_MSG, CUSTOM_CAPTION, DISABLE_CHANNEL
 from helper_func import subscribed, encode, decode, get_messages
 from database.database import add_user, del_user, full_userbase, present_user
 
-DELETE_TIMEOUT = 30  # 10 minutes in seconds
+DELETE_TIMEOUT = 600  # 10 minutes in seconds
 
 @Bot.on_message(filters.command('start') & filters.private & subscribed)
 async def start_command(client: Client, message: Message):
@@ -72,33 +72,45 @@ async def start_command(client: Client, message: Message):
             try:
                 sent_msg = await msg.copy(chat_id=message.from_user.id, caption=caption, parse_mode=ParseMode.HTML, reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
                 await asyncio.sleep(0.5)
-                asyncio.create_task(delete_after_timeout(client, sent_msg))
                 sent_messages.append(sent_msg.message_id)
             except FloodWait as e:
                 await asyncio.sleep(e.x)
                 sent_msg = await msg.copy(chat_id=message.from_user.id, caption=caption, parse_mode=ParseMode.HTML, reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
                 await asyncio.sleep(0.5)
-                asyncio.create_task(delete_after_timeout(client, sent_msg))
                 sent_messages.append(sent_msg.message_id)
             except:
                 pass
 
-        retrieve_button = InlineKeyboardMarkup(
-            [
+        if sent_messages:
+            await message.reply_text(
+                text="Files will be deleted in 10 minutes.\nForward to saved messages before downloading.",
+                quote=True
+            )
+
+            await asyncio.sleep(DELETE_TIMEOUT)
+
+            for msg_id in sent_messages:
+                try:
+                    await client.delete_messages(chat_id=message.from_user.id, message_ids=msg_id)
+                except:
+                    pass
+
+            retrieve_button = InlineKeyboardMarkup(
                 [
-                    InlineKeyboardButton("Retrieve File", callback_data=f"retrieve_{id}")
+                    [
+                        InlineKeyboardButton("Retrieve File", callback_data=f"retrieve_{id}")
+                    ]
                 ]
-            ]
-        )
+            )
 
-        await message.reply_text(
-            text="Files will be deleted in 10 minutes. Forward to saved messages before downloading.",
-            reply_markup=retrieve_button,
-            quote=True
-        )
+            await message.reply_text(
+                text="Your Video/File is Deleted. Click on the below button to get files again",
+                reply_markup=retrieve_button,
+                quote=True
+            )
 
-        # Store the sent messages for retrieval
-        client.sent_files[id] = sent_messages
+            # Store the sent messages for retrieval
+            client.sent_files[id] = sent_messages
         return
     else:
         reply_markup = InlineKeyboardMarkup(
@@ -122,10 +134,6 @@ async def start_command(client: Client, message: Message):
             quote=True
         )
         return
-
-async def delete_after_timeout(client: Client, message: Message):
-    await asyncio.sleep(DELETE_TIMEOUT)
-    await message.delete()
 
 @Bot.on_callback_query(filters.regex(r"^retrieve_"))
 async def retrieve_files(client: Client, callback_query: CallbackQuery):
@@ -199,7 +207,7 @@ async def send_text(client: Bot, message: Message):
         blocked = 0
         deleted = 0
         unsuccessful = 0
-
+        
         pls_wait = await message.reply("<i>Broadcasting Message.. This will Take Some Time</i>")
         for chat_id in query:
             try:
@@ -219,7 +227,7 @@ async def send_text(client: Bot, message: Message):
                 unsuccessful += 1
                 pass
             total += 1
-
+        
         status = f"""<b><u>Broadcast Completed</u>
 
 Total Users: <code>{total}</code>
@@ -227,7 +235,7 @@ Successful: <code>{successful}</code>
 Blocked Users: <code>{blocked}</code>
 Deleted Accounts: <code>{deleted}</code>
 Unsuccessful: <code>{unsuccessful}</code></b>"""
-
+        
         return await pls_wait.edit(status)
 
     else:
