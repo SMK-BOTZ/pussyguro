@@ -37,7 +37,8 @@ async def send_files(client: Client, user_id: int, ids: list[int], base64_string
             await asyncio.sleep(e.x)
             snt_msg = await msg.copy(chat_id=user_id, caption=caption, parse_mode=ParseMode.HTML, reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
             snt_msgs.append(snt_msg)
-        except:
+        except Exception as e:
+            print(f"Error: {e}")
             pass
 
     await client.send_message(
@@ -49,13 +50,16 @@ async def send_files(client: Client, user_id: int, ids: list[int], base64_string
     for snt_msg in snt_msgs:
         try:
             await snt_msg.delete()
-        except:
+        except Exception as e:
+            print(f"Error: {e}")
             pass
 
+    # Use client.username for dynamic bot username
+    retrieve_url = f"https://t.me/{client.username}?start={base64_string}"
     await client.send_message(
         user_id,
         "Files have been deleted.\nClick the button below to retrieve the files again.",
-        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Retrieve Files", callback_data=f"retrieve_{base64_string}")]])
+        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Retrieve Files", url=retrieve_url)]])
     )
 
 @Bot.on_message(filters.command('start') & filters.private & subscribed)
@@ -64,7 +68,8 @@ async def start_command(client: Client, message: Message):
     if not await present_user(id):
         try:
             await add_user(id)
-        except:
+        except Exception as e:
+            print(f"Error: {e}")
             pass
     text = message.text
     if len(text) > 7:
@@ -81,7 +86,7 @@ async def start_command(client: Client, message: Message):
             except:
                 return
             if start <= end:
-                ids = range(start, end+1)
+                ids = range(start, end + 1)
             else:
                 ids = []
                 i = start
@@ -96,7 +101,7 @@ async def start_command(client: Client, message: Message):
             except:
                 return
 
-        await send_files(client, message.from_user.id, ids, base64_string)
+        await send_files(client, message.from_user.id, list(ids), base64_string)
         return
     else:
         reply_markup = InlineKeyboardMarkup(
@@ -152,7 +157,7 @@ async def retrieve_files(client: Client, callback_query: CallbackQuery):
             return
 
     await callback_query.message.delete()
-    await send_files(client, user_id, ids, base64_string)
+    await send_files(client, user_id, list(ids), base64_string)
 
 @Bot.on_message(filters.command('start') & filters.private)
 async def not_joined(client: Client, message: Message):
