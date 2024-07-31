@@ -18,6 +18,12 @@ async def send_files(client: Client, user_id: int, ids: list[int], base64_string
     messages = await get_messages(client, ids)
     snt_msgs = []
 
+    # Send initial message and save reference
+    temp_msg = await client.send_message(
+        user_id,
+        "Files will be deleted in 10 minutes.\nForward to saved messages before downloading"
+    )
+    
     for msg in messages:
         if bool(CUSTOM_CAPTION) & bool(msg.document):
             caption = CUSTOM_CAPTION.format(previouscaption="" if not msg.caption else msg.caption.html, filename=msg.document.file_name)
@@ -41,18 +47,23 @@ async def send_files(client: Client, user_id: int, ids: list[int], base64_string
             print(f"Error: {e}")
             pass
 
-    await client.send_message(
-        user_id,
-        "Files will be deleted in 10 minutes.\nForward to saved messages before downloading"
-    )
+    # Wait for the specified time
     await asyncio.sleep(SECONDS)
 
+    # Delete files
     for snt_msg in snt_msgs:
         try:
             await snt_msg.delete()
         except Exception as e:
             print(f"Error: {e}")
             pass
+
+    # Delete the initial message
+    try:
+        await temp_msg.delete()
+    except Exception as e:
+        print(f"Error: {e}")
+        pass
 
     # Use client.username for dynamic bot username
     retrieve_url = f"https://t.me/{client.username}?start={base64_string}"
@@ -61,7 +72,6 @@ async def send_files(client: Client, user_id: int, ids: list[int], base64_string
         "Files have been deleted.\nClick the button below to retrieve the files again.",
         reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Retrieve Files", url=retrieve_url)]])
     )
-
 @Bot.on_message(filters.command('start') & filters.private & subscribed)
 async def start_command(client: Client, message: Message):
     id = message.from_user.id
