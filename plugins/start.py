@@ -1,3 +1,5 @@
+#PoweredBySAHIL
+
 import os
 import asyncio
 from pyrogram import Client, filters, __version__
@@ -12,7 +14,7 @@ from database.database import add_user, del_user, full_userbase, present_user
 
 """Add time in seconds for waiting before delete 
 1min = 60, 2min = 60*2 = 120, 5min = 60*5 = 300"""
-SECONDS = int(os.getenv("SECONDS", "10"))
+SECONDS = int(os.getenv("SECONDS", "1800"))
 
 async def send_files(client: Client, user_id: int, ids: list[int], base64_string: str):
     messages = await get_messages(client, ids)
@@ -45,7 +47,7 @@ async def send_files(client: Client, user_id: int, ids: list[int], base64_string
     # Send the notification message about file deletion
     temp_msg = await client.send_message(
         user_id,
-        "Files will be deleted in 10 minutes.\nForward to saved messages before downloading"
+        "<b>⚠️ Fɪʟᴇꜱ ᴡɪʟʟ ʙᴇ Dᴇʟᴇᴛᴇᴅ ɪɴ 30 ᴍɪɴꜱ\n\n♻️ Pʟᴇᴀꜱᴇ Fᴏʀᴡᴀʀᴅ ɪᴛ ᴛᴏ Sᴀᴠᴇᴅ Mᴇꜱꜱᴀɢᴇꜱ Bᴇꜰᴏʀᴇ Dᴏᴡɴʟᴏᴀᴅɪɴɢ..!</b>"
     )
 
     # Wait for the specified time
@@ -70,7 +72,7 @@ async def send_files(client: Client, user_id: int, ids: list[int], base64_string
     retrieve_url = f"https://t.me/{client.username}?start={base64_string}"
     await client.send_message(
         user_id,
-        "Files have been deleted.\nClick the button below to retrieve the files again.",
+        "<b>🚫 Fɪʟᴇꜱ ʜᴀꜱ ʙᴇᴇɴ Dᴇʟᴇᴛᴇᴅ.\n\n✅ Cʟɪᴄᴋ ᴛʜᴇ Bᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴛʜᴇ Fɪʟᴇꜱ Aɢᴀɪɴ.</b>",
         reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Retrieve Files", url=retrieve_url)]])
     )
 
