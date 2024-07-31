@@ -12,7 +12,7 @@ from database.database import add_user, del_user, full_userbase, present_user
 
 """Add time in seconds for waiting before delete 
 1min = 60, 2min = 60*2 = 120, 5min = 60*5 = 300"""
-SECONDS = int(os.getenv("SECONDS", "60"))
+SECONDS = int(os.getenv("SECONDS", "30"))
 
 async def send_files(client: Client, user_id: int, ids: list[int]):
     messages = await get_messages(client, ids)
@@ -126,9 +126,8 @@ async def retrieve_files(client: Client, callback_query: CallbackQuery):
     user_id = int(callback_query.data.split("_")[1])
     if callback_query.from_user.id == user_id:
         await callback_query.message.delete()
-        # Decode the original arguments to regenerate the list of message IDs
-        text = callback_query.message.reply_to_message.text
-        base64_string = text.split(" ", 1)[1]
+        original_text = callback_query.message.reply_to_message.text
+        base64_string = original_text.split(" ", 1)[1]
         string = await decode(base64_string)
         argument = string.split("-")
         if len(argument) == 3:
@@ -152,6 +151,7 @@ async def retrieve_files(client: Client, callback_query: CallbackQuery):
                 ids = [int(int(argument[1]) / abs(client.db_channel.id))]
             except:
                 return
+
         await send_files(client, user_id, ids)
 
 @Bot.on_message(filters.command('start') & filters.private)
