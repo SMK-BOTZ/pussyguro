@@ -12,9 +12,9 @@ from database.database import add_user, del_user, full_userbase, present_user
 
 """Add time in seconds for waiting before delete 
 1min = 60, 2min = 60*2 = 120, 5min = 60*5 = 300"""
-SECONDS = int(os.getenv("SECONDS", "30"))
+SECONDS = int(os.getenv("SECONDS", "10"))
 
-async def send_files(client: Client, user_id: int, ids: list[int]):
+async def send_files(client: Client, user_id: int, ids: list[int], base64_string: str):
     messages = await get_messages(client, ids)
     snt_msgs = []
 
@@ -55,7 +55,7 @@ async def send_files(client: Client, user_id: int, ids: list[int]):
     await client.send_message(
         user_id,
         "Files have been deleted.\nClick the button below to retrieve the files again.",
-        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Retrieve Files", callback_data=f"retrieve_{user_id}")]])
+        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Retrieve Files", callback_data=f"retrieve_{base64_string}")]])
     )
 
 @Bot.on_message(filters.command('start') & filters.private & subscribed)
@@ -96,7 +96,7 @@ async def start_command(client: Client, message: Message):
             except:
                 return
 
-        await send_files(client, message.from_user.id, ids)
+        await send_files(client, message.from_user.id, ids, base64_string)
         return
     else:
         reply_markup = InlineKeyboardMarkup(
@@ -121,38 +121,38 @@ async def start_command(client: Client, message: Message):
         )
         return
 
-@Bot.on_callback_query(filters.regex(r"retrieve_(\d+)"))
+@Bot.on_callback_query(filters.regex(r"retrieve_(.+)"))
 async def retrieve_files(client: Client, callback_query: CallbackQuery):
-    user_id = int(callback_query.data.split("_")[1])
-    if callback_query.from_user.id == user_id:
-        await callback_query.message.delete()
-        original_text = callback_query.message.reply_to_message.text
-        base64_string = original_text.split(" ", 1)[1]
-        string = await decode(base64_string)
-        argument = string.split("-")
-        if len(argument) == 3:
-            try:
-                start = int(int(argument[1]) / abs(client.db_channel.id))
-                end = int(int(argument[2]) / abs(client.db_channel.id))
-            except:
-                return
-            if start <= end:
-                ids = range(start, end+1)
-            else:
-                ids = []
-                i = start
-                while True:
-                    ids.append(i)
-                    i -= 1
-                    if i < end:
-                        break
-        elif len(argument) == 2:
-            try:
-                ids = [int(int(argument[1]) / abs(client.db_channel.id))]
-            except:
-                return
+    base64_string = callback_query.data.split("_")[1]
+    user_id = callback_query.from_user.id
 
-        await send_files(client, user_id, ids)
+    original_string = await decode(base64_string)
+    argument = original_string.split("-")
+
+    if len(argument) == 3:
+        try:
+            start = int(int(argument[1]) / abs(client.db_channel.id))
+            end = int(int(argument[2]) / abs(client.db_channel.id))
+        except:
+            return
+        if start <= end:
+            ids = range(start, end + 1)
+        else:
+            ids = []
+            i = start
+            while True:
+                ids.append(i)
+                i -= 1
+                if i < end:
+                    break
+    elif len(argument) == 2:
+        try:
+            ids = [int(int(argument[1]) / abs(client.db_channel.id))]
+        except:
+            return
+
+    await callback_query.message.delete()
+    await send_files(client, user_id, ids, base64_string)
 
 @Bot.on_message(filters.command('start') & filters.private)
 async def not_joined(client: Client, message: Message):
