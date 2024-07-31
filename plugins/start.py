@@ -1,5 +1,3 @@
-#(©)CodeXBotz
-
 import os
 import asyncio
 from pyrogram import Client, filters, __version__
@@ -14,7 +12,51 @@ from database.database import add_user, del_user, full_userbase, present_user
 
 """Add time in seconds for waiting before delete 
 1min = 60, 2min = 60*2 = 120, 5min = 60*5 = 300"""
-SECONDS = int(os.getenv("SECONDS", "600"))
+SECONDS = int(os.getenv("SECONDS", "60"))
+
+async def send_files(client: Client, user_id: int, ids: list[int]):
+    messages = await get_messages(client, ids)
+    snt_msgs = []
+
+    for msg in messages:
+        if bool(CUSTOM_CAPTION) & bool(msg.document):
+            caption = CUSTOM_CAPTION.format(previouscaption="" if not msg.caption else msg.caption.html, filename=msg.document.file_name)
+        else:
+            caption = "" if not msg.caption else msg.caption.html
+
+        if DISABLE_CHANNEL_BUTTON:
+            reply_markup = msg.reply_markup
+        else:
+            reply_markup = None
+
+        try:
+            snt_msg = await msg.copy(chat_id=user_id, caption=caption, parse_mode=ParseMode.HTML, reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
+            await asyncio.sleep(0.5)
+            snt_msgs.append(snt_msg)
+        except FloodWait as e:
+            await asyncio.sleep(e.x)
+            snt_msg = await msg.copy(chat_id=user_id, caption=caption, parse_mode=ParseMode.HTML, reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
+            snt_msgs.append(snt_msg)
+        except:
+            pass
+
+    await client.send_message(
+        user_id,
+        "Files will be deleted in 10 minutes.\nForward to saved messages before downloading"
+    )
+    await asyncio.sleep(SECONDS)
+
+    for snt_msg in snt_msgs:
+        try:
+            await snt_msg.delete()
+        except:
+            pass
+
+    await client.send_message(
+        user_id,
+        "Files have been deleted.\nClick the button below to retrieve the files again.",
+        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Retrieve Files", callback_data=f"retrieve_{user_id}")]])
+    )
 
 @Bot.on_message(filters.command('start') & filters.private & subscribed)
 async def start_command(client: Client, message: Message):
@@ -53,48 +95,8 @@ async def start_command(client: Client, message: Message):
                 ids = [int(int(argument[1]) / abs(client.db_channel.id))]
             except:
                 return
-        temp_msg = await message.reply("Please wait...")
-        try:
-            messages = await get_messages(client, ids)
-        except:
-            await message.reply_text("Something went wrong..!")
-            return
-        await temp_msg.delete()
 
-        snt_msgs = []
-
-        for msg in messages:
-            if bool(CUSTOM_CAPTION) & bool(msg.document):
-                caption = CUSTOM_CAPTION.format(previouscaption="" if not msg.caption else msg.caption.html, filename=msg.document.file_name)
-            else:
-                caption = "" if not msg.caption else msg.caption.html
-
-            if DISABLE_CHANNEL_BUTTON:
-                reply_markup = msg.reply_markup
-            else:
-                reply_markup = None
-
-            try:
-                snt_msg = await msg.copy(chat_id=message.from_user.id, caption=caption, parse_mode=ParseMode.HTML, reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
-                await asyncio.sleep(0.5)
-                snt_msgs.append(snt_msg)
-            except FloodWait as e:
-                await asyncio.sleep(e.x)
-                snt_msg = await msg.copy(chat_id=message.from_user.id, caption=caption, parse_mode=ParseMode.HTML, reply_markup=reply_markup, protect_content=PROTECT_CONTENT)
-                snt_msgs.append(snt_msg)
-            except:
-                pass
-
-        await message.reply_text("Files will be deleted in 10 minutes.\nForward to saved messages before downloading")
-        await asyncio.sleep(SECONDS)
-
-        for snt_msg in snt_msgs:
-            try:
-                await snt_msg.delete()
-            except:
-                pass
-
-        await message.reply_text("Files have been deleted.\nClick the button below to retrieve the files again.", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Retrieve Files", callback_data=f"retrieve_{message.from_user.id}")]]))
+        await send_files(client, message.from_user.id, ids)
         return
     else:
         reply_markup = InlineKeyboardMarkup(
@@ -119,21 +121,38 @@ async def start_command(client: Client, message: Message):
         )
         return
 
-#=====================================================================================##
-
-WAIT_MSG = """"<b>Processing ...</b>"""
-
-REPLY_ERROR = """<code>Use this command as a replay to any telegram message with out any spaces.</code>"""
-
-#=====================================================================================##
-
-
 @Bot.on_callback_query(filters.regex(r"retrieve_(\d+)"))
 async def retrieve_files(client: Client, callback_query: CallbackQuery):
     user_id = int(callback_query.data.split("_")[1])
     if callback_query.from_user.id == user_id:
         await callback_query.message.delete()
-        await start_command(client, callback_query.message)
+        # Decode the original arguments to regenerate the list of message IDs
+        text = callback_query.message.reply_to_message.text
+        base64_string = text.split(" ", 1)[1]
+        string = await decode(base64_string)
+        argument = string.split("-")
+        if len(argument) == 3:
+            try:
+                start = int(int(argument[1]) / abs(client.db_channel.id))
+                end = int(int(argument[2]) / abs(client.db_channel.id))
+            except:
+                return
+            if start <= end:
+                ids = range(start, end+1)
+            else:
+                ids = []
+                i = start
+                while True:
+                    ids.append(i)
+                    i -= 1
+                    if i < end:
+                        break
+        elif len(argument) == 2:
+            try:
+                ids = [int(int(argument[1]) / abs(client.db_channel.id))]
+            except:
+                return
+        await send_files(client, user_id, ids)
 
 @Bot.on_message(filters.command('start') & filters.private)
 async def not_joined(client: Client, message: Message):
@@ -169,7 +188,7 @@ async def not_joined(client: Client, message: Message):
 
 @Bot.on_message(filters.command('users') & filters.private & filters.user(ADMINS))
 async def get_users(client: Bot, message: Message):
-    msg = await client.send_message(chat_id=message.chat.id, text=WAIT_MSG)
+    msg = await client.send_message(chat_id=message.chat.id, text="Processing ...")
     users = await full_userbase()
     await msg.edit(f"{len(users)} users are using this bot")
 
@@ -215,6 +234,6 @@ Unsuccessful: <code>{unsuccessful}</code></b>"""
         return await pls_wait.edit(status)
 
     else:
-        msg = await message.reply(REPLY_ERROR)
+        msg = await message.reply("<code>Use this command as a reply to any telegram message without any spaces.</code>")
         await asyncio.sleep(8)
         await msg.delete()
