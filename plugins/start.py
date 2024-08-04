@@ -183,7 +183,19 @@ async def retrieve_files(client: Client, callback_query: CallbackQuery):
 async def not_joined(client: Client, message: Message):
     buttons = [
         [
-            InlineKeyboardButton("Join Channel", url=client.invitelink)
+            InlineKeyboardButton(
+                "ᴛᴇᴀᴍ ʟᴇɢᴇɴᴅ ᴏꜰꜰɪᴄɪᴀʟ ⚡️",
+                url = "https://t.me/Team_Legend_Official")
+        ],
+        [
+            InlineKeyboardButton(
+                "ᴊᴏɪɴ ʙᴀᴄᴋᴜᴘ ᴄʜᴀɴɴᴇʟ 🔥",
+                url = client.invitelink)
+        ],
+        [
+            InlineKeyboardButton(
+                "ꜱʜᴀʀᴇ ᴛʜɪꜱ ʙᴏᴛ 👨🏻‍💻",
+                url = "https://telegram.me/share/url?url=https://t.me/LegendFileSaver_Bot")
         ]
     ]
     try:
