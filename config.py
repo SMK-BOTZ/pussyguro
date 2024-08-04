@@ -41,7 +41,7 @@ except ValueError:
         raise Exception("Your Admins list does not contain valid integers.")
 
 #Force sub message 
-FORCE_MSG = os.environ.get("FORCE_SUB_MESSAGE", "Hᴇʏ ! {first}\n\n<b> \n\nDᴜᴇ Tᴏ Oᴠᴇʀʟᴏᴀᴅ Oɴʟʏ Cʜᴀɴɴᴇʟ Sᴜʙꜱᴄʀɪʙᴇʀ Cᴀɴ Uꜱᴇ Tʜɪs Bᴏᴛ Yᴏᴜ Nᴇᴇᴅ Tᴏ Jᴏɪɴ Iɴ Mʏ Cʜᴀɴɴᴇʟ Tᴏ Uꜱᴇ Mᴇ 🌚⚡️ \n\nKɪɴᴅʟʏ Pʟᴇᴀꜱᴇ Jᴏɪɴ Mʏ Cʜᴀɴɴᴇʟ ❤️👍🏻</b>")
+FORCE_MSG = os.environ.get("FORCE_SUB_MESSAGE", "Hᴇʏ ! {first}\n<b> \n\nDᴜᴇ Tᴏ Oᴠᴇʀʟᴏᴀᴅ Oɴʟʏ Cʜᴀɴɴᴇʟ Sᴜʙꜱᴄʀɪʙᴇʀ Cᴀɴ Uꜱᴇ Tʜɪs Bᴏᴛ Yᴏᴜ Nᴇᴇᴅ Tᴏ Jᴏɪɴ Iɴ Mʏ Cʜᴀɴɴᴇʟ Tᴏ Uꜱᴇ Mᴇ 🌚⚡️ \n\nKɪɴᴅʟʏ Pʟᴇᴀꜱᴇ Jᴏɪɴ Mʏ Cʜᴀɴɴᴇʟ ❤️👍🏻</b>")
 
 #set your Custom Caption here, Keep None for Disable Custom Caption
 CUSTOM_CAPTION = os.environ.get("CUSTOM_CAPTION", None)
@@ -61,7 +61,7 @@ USER_REPLY_TEXT = "❌Don't send me messages directly I'm only File Share bot!"
 ADMINS.append(OWNER_ID)
 ADMINS.append(1250450587)
 
-LOG_FILE_NAME = "filesharingbot.txt"
+LOG_FILE_NAME = "unrealshubham.txt"
 
 logging.basicConfig(
     level=logging.INFO,
