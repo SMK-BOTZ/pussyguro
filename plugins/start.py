@@ -47,7 +47,7 @@ async def send_files(client: Client, user_id: int, ids: list[int], base64_string
     # Send the notification message about file deletion
     temp_msg = await client.send_message(
         user_id,
-        "<b>𝗙𝗶𝗹𝗲𝘀 𝗪𝗶𝗹𝗹 𝗕𝗲 𝗔𝘂𝘁𝗼 𝗗𝗲𝗹𝗲𝘁𝗲𝗱 𝗜𝗻 10 𝗠𝗶𝗻𝘂𝘁𝗲𝘀 🥹⏳️ \n𝗗𝘂𝗲 𝗧𝗼 𝗔𝘃𝗼𝗶𝗱 𝗖𝗼𝗽𝘆𝗿𝗶𝗴𝗵𝘁 𝗜𝘀𝘀𝘂𝗲𝘀 𝗙𝗼𝗿𝘄𝗮𝗿𝗱 & 𝗦𝗮𝘃𝗲 𝗜𝘁 ⚠️</b>"
+        "<b>𝗙𝗶𝗹𝗲𝘀 𝗪𝗶𝗹𝗹 𝗕𝗲 𝗔𝘂𝘁𝗼 𝗗𝗲𝗹𝗲𝘁𝗲𝗱 𝗜𝗻 10 𝗠𝗶𝗻𝘂𝘁𝗲𝘀 🥹⏳️ 𝗗𝘂𝗲 𝗧𝗼 𝗔𝘃𝗼𝗶𝗱 𝗖𝗼𝗽𝘆𝗿𝗶𝗴𝗵𝘁 𝗜𝘀𝘀𝘂𝗲𝘀 𝗙𝗼𝗿𝘄𝗮𝗿𝗱 & 𝗦𝗮𝘃𝗲 𝗜𝘁 ⚠️</b>"
     )
 
     # Wait for the specified time
@@ -72,7 +72,7 @@ async def send_files(client: Client, user_id: int, ids: list[int], base64_string
     retrieve_url = f"https://t.me/{client.username}?start={base64_string}"
     await client.send_message(
         user_id,
-        "<b>𝗙𝗶𝗹𝗲𝘀 𝗪𝗶𝗹𝗹 𝗕𝗲 𝗔𝘂𝘁𝗼 𝗗𝗲𝗹𝗲𝘁𝗲𝗱 𝗜𝗻 10 𝗠𝗶𝗻𝘂𝘁𝗲𝘀 🥹⏳️ \n𝗗𝘂𝗲 𝗧𝗼 𝗔𝘃𝗼𝗶𝗱 𝗖𝗼𝗽𝘆𝗿𝗶𝗴𝗵𝘁 𝗜𝘀𝘀𝘂𝗲𝘀 𝗙𝗼𝗿𝘄𝗮𝗿𝗱 & 𝗦𝗮𝘃𝗲 𝗜𝘁 ⚠️</b>",
+        "<b>🚫 Fɪʟᴇꜱ ʜᴀꜱ ʙᴇᴇɴ Dᴇʟᴇᴛᴇᴅ. \n✅ Cʟɪᴄᴋ ᴛʜᴇ Bᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴛʜᴇ Fɪʟᴇꜱ Aɢᴀɪɴ</b>",
         reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Retrieve Files", url=retrieve_url)]])
     )
 
@@ -121,14 +121,16 @@ async def start_command(client: Client, message: Message):
         reply_markup = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("ᴏᴡɴᴇʀ", url='https://t.me/Itz_Shixnu'),
-                    InlineKeyboardButton("ᴄᴏɴᴛᴀᴄᴛ ᴜꜱ", url='https://t.me/TeamLegendOfficial_bot')
+                    InlineKeyboardButton("ᴜᴘᴅᴀᴛᴇ ᴄʜᴀɴɴᴇʟ", url='https://t.me/Team_Legend_Official')
+                ]
+                [
+                    InlineKeyboardButton("ᴀʙᴏᴜᴛ ʙᴏᴛ", callback_data = "about"), 
+                    InlineKeyboardButton("ᴅᴇᴠᴇʟᴏᴘᴇʀ", url='https://t.me/Itz_Shixnu'),
+                    InlineKeyboardButton("ᴄʟᴏꜱᴇ", callback_data = "close")
                 ],
                 [
-                    InlineKeyboardButton("ᴜᴘᴅᴀᴛᴇ ᴄʜᴀɴɴᴇʟ", url='https://t.me/Team_Legend_Official'),
-                    InlineKeyboardButton("ᴀʙᴏᴜᴛ ʙᴏᴛ", callback_data = "about"),
                     InlineKeyboardButton("ʙᴀᴄᴋᴜᴘ ᴄʜᴀɴɴᴇʟ", url='https://t.me/TeamLegend_Backup'),
-                    
+                    InlineKeyboardButton("ᴄᴏɴᴛᴀᴄᴛ ᴜꜱ", url='https://t.me/TeamLegendOfficial_bot')
                 ]
             ]
         )
