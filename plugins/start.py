@@ -72,8 +72,8 @@ async def send_files(client: Client, user_id: int, ids: list[int], base64_string
     retrieve_url = f"https://t.me/{client.username}?start={base64_string}"
     await client.send_message(
         user_id,
-        "<b>🚫 Fɪʟᴇꜱ ʜᴀꜱ ʙᴇᴇɴ Dᴇʟᴇᴛᴇᴅ. \n✅ Cʟɪᴄᴋ ᴛʜᴇ Bᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ ᴛᴏ ɢᴇᴛ ᴛʜᴇ Fɪʟᴇꜱ Aɢᴀɪɴ</b>",
-        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Retrieve Files", url=retrieve_url)]])
+        "<b>● Yᴏᴜʀ Fɪʟᴇꜱ Hᴀꜱ Sᴜᴄᴄᴇꜱꜱꜰᴜʟʟʏ Dᴇʟᴇᴛᴇᴅ 🥺❤️ \n● Cʟɪᴄᴋ Tʜᴇ Bᴜᴛᴛᴏɴ Bᴇʟᴏᴡ Tᴏ Gᴇᴛ Fɪʟᴇꜱ Aɢᴀɪɴ 📄</b>",
+        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Rᴇᴛʀɪᴇᴠᴇ Fɪʟᴇꜱ Bᴀᴄᴋ ⚡️", url=retrieve_url)]])
     )
 
 @Bot.on_message(filters.command('start') & filters.private & subscribed)
