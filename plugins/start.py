@@ -185,26 +185,19 @@ async def retrieve_files(client: Client, callback_query: CallbackQuery):
 async def not_joined(client: Client, message: Message):
     buttons = [
         [
-            InlineKeyboardButton(
-                "˹ Tᴇᴀᴍ Lᴇɢᴇɴᴅ ✘ Eᴅᴜᴄᴀᴛɪᴏɴ ˼ ⚡️",
-                url = "https://t.me/Team_Legend_Official")
-        ],
-        [
-            InlineKeyboardButton(
-                "˹ Tᴇᴀᴍ Lᴇɢᴇɴᴅ ✘ Bᴀᴄᴋᴜᴘ ˼ ❤️",
-                url = client.invitelink)
-        ],
-        [
-            InlineKeyboardButton(
-                "ꜱʜᴀʀᴇ ᴛʜɪꜱ ʙᴏᴛ 👨🏻‍💻",
-                url = "https://telegram.me/share/url?url=https://t.me/LegendFileSaver_Bot")
-        ],
-        [
-            InlineKeyboardButton(
-                "ʀᴇꜱᴛᴀʀᴛ ʙᴏᴛ ᴀɢᴀɪɴ ⚡",
-                url = "https://t.me/LegendFileSaver_Bot?start=start_")
+            InlineKeyboardButton(text="Join Channel", url=client.invitelink),
+            InlineKeyboardButton(text="Join Channel", url=client.invitelink2),
         ]
     ]
+    try:
+        buttons.append(
+            [
+                InlineKeyboardButton(
+                    text = 'Try Again',
+                    url = f"https://t.me/{client.username}?start={message.command[1]}"
+                )
+            ]
+        )
     except IndexError:
         pass
 
