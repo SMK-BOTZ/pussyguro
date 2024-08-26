@@ -199,11 +199,6 @@ async def not_joined(client: Client, message: Message):
             InlineKeyboardButton(
                 "ꜱʜᴀʀᴇ ᴛʜɪꜱ ʙᴏᴛ 👨🏻‍💻",
                 url = "https://telegram.me/share/url?url=https://t.me/LegendFileSaver_Bot")
-        ],
-        [
-            InlineKeyboardButton(
-                "ʀᴇꜱᴛᴀʀᴛ ʙᴏᴛ ᴀɢᴀɪɴ ⚡",
-                url = "https://t.me/LegendFileSaver_Bot?start=start_")
         ]
     ]
     try:
