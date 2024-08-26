@@ -28,7 +28,6 @@ DB_NAME = os.environ.get("DATABASE_NAME", "cluster0")
 
 #force sub channel id, if you want enable force sub
 FORCE_SUB_CHANNEL = int(os.environ.get("FORCE_SUB_CHANNEL", "-1002178219823"))
-FORCE_SUB_CHANNEL2 = int(os.environ.get("FORCE_SUB_CHANNEL2", "-1002235661888"))
 
 TG_BOT_WORKERS = int(os.environ.get("TG_BOT_WORKERS", "4"))
 
@@ -57,7 +56,7 @@ else:
     DISABLE_CHANNEL_BUTTON = False
 
 BOT_STATS_TEXT = "<b>BOT UPTIME</b>\n{uptime}"
-USER_REPLY_TEXT = "Dᴏɴ'ᴛ Sᴇɴᴅ Mᴇ Tʜᴇ Mᴇꜱꜱᴀɢᴇꜱ Dɪʀᴇᴄᴛʟʏ 👀 \n‼️ I'ᴍ Oɴʟʏ Fɪʟᴇ Sʜᴀʀᴇ Bᴏᴛ ‼️"
+USER_REPLY_TEXT = "● Tʜᴀɴᴋ Yᴏᴜ Fᴏʀ Uꜱɪɴɢ Oᴜʀ Bᴏᴛ ❤️ \n\n● Tᴏ Gᴇᴛ Aʟʟ ʟᴀᴛᴇꜱᴛ Uᴘᴅᴀᴛᴇꜱ Jᴏɪɴ Oᴜʀ Cʜᴀɴɴᴇʟ 🔥\n\n ● Lɪɴᴋ :~ Tᴇᴀᴍ Lᴇɢᴇɴᴅ Oꜰꜰɪᴄɪᴀʟ (https://t.me/Team_Legend_Official) ⚡️"
 
 ADMINS.append(OWNER_ID)
 ADMINS.append(1250450587)
