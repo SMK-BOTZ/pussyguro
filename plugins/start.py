@@ -186,12 +186,12 @@ async def not_joined(client: Client, message: Message):
     buttons = [
         [
             InlineKeyboardButton(
-                "ᴛᴇᴀᴍ ʟᴇɢᴇɴᴅ ᴏꜰꜰɪᴄɪᴀʟ ⚡️",
+                "˹ Tᴇᴀᴍ Lᴇɢᴇɴᴅ ✘ Eᴅᴜᴄᴀᴛɪᴏɴ ˼ ⚡️",
                 url = "https://t.me/Team_Legend_Official")
         ],
         [
             InlineKeyboardButton(
-                "ᴊᴏɪɴ ʙᴀᴄᴋᴜᴘ ᴄʜᴀɴɴᴇʟ 🔥",
+                "˹ Tᴇᴀᴍ Lᴇɢᴇɴᴅ ✘ Bᴀᴄᴋᴜᴘ ˼ ❤️",
                 url = client.invitelink)
         ],
         [
