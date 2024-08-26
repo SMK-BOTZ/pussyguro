@@ -134,17 +134,18 @@ async def start_command(client: Client, message: Message):
                 ]
             ]
         )
-        await message.reply_text(
-            text=START_MSG.format(
+        picture_url = "https://telegra.ph/file/1dff3bd1a4e8776b64f44.jpg"
+        await client.send_photo(
+            chat_id=message.chat.id,
+            photo=picture_url,
+            caption=START_MSG.format(
                 first=message.from_user.first_name,
                 last=message.from_user.last_name,
                 username=None if not message.from_user.username else '@' + message.from_user.username,
                 mention=message.from_user.mention,
                 id=message.from_user.id
             ),
-            reply_markup=reply_markup,
-            disable_web_page_preview=True,
-            quote=True
+            reply_markup=reply_markup
         )
         return
 
@@ -185,19 +186,26 @@ async def retrieve_files(client: Client, callback_query: CallbackQuery):
 async def not_joined(client: Client, message: Message):
     buttons = [
         [
-            InlineKeyboardButton(text="Join Channel", url=client.invitelink),
-            InlineKeyboardButton(text="Join Channel", url=client.invitelink2),
+            InlineKeyboardButton(
+                "˹ Tᴇᴀᴍ Lᴇɢᴇɴᴅ ✘ Eᴅᴜᴄᴀᴛɪᴏɴ ˼ ⚡️",
+                url = "https://t.me/Team_Legend_Official")
+        ],
+        [
+            InlineKeyboardButton(
+                "˹ Tᴇᴀᴍ Lᴇɢᴇɴᴅ ✘ Bᴀᴄᴋᴜᴘ ˼ ❤️",
+                url = client.invitelink)
+        ],
+        [
+            InlineKeyboardButton(
+                "ꜱʜᴀʀᴇ ᴛʜɪꜱ ʙᴏᴛ 👨🏻‍💻",
+                url = "https://telegram.me/share/url?url=https://t.me/LegendFileSaver_Bot")
+        ],
+        [
+            InlineKeyboardButton(
+                "ʀᴇꜱᴛᴀʀᴛ ʙᴏᴛ ᴀɢᴀɪɴ ⚡",
+                url = "https://t.me/LegendFileSaver_Bot?start=start_")
         ]
     ]
-    try:
-        buttons.append(
-            [
-                InlineKeyboardButton(
-                    text = 'Try Again',
-                    url = f"https://t.me/{client.username}?start={message.command[1]}"
-                )
-            ]
-        )
     except IndexError:
         pass
 
