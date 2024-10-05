@@ -17,7 +17,7 @@ API_HASH = os.environ.get("API_HASH", "4022d5686b9b7a7cf8891205921a0ab3")
 CHANNEL_ID = int(os.environ.get("CHANNEL_ID", "-1002000189850"))
 
 #OWNER ID
-OWNER_ID = int(os.environ.get("OWNER_ID", "6668627674"))
+OWNER_ID = int(os.environ.get("OWNER_ID", "7871556756"))
 
 #Port
 PORT = os.environ.get("PORT", "8080")
@@ -35,7 +35,7 @@ TG_BOT_WORKERS = int(os.environ.get("TG_BOT_WORKERS", "4"))
 START_MSG = os.environ.get("START_MESSAGE", "<b> 𝗛𝗲𝘆 , {mention} ✨️ \n\n𝗪𝗲𝗹𝗰𝗼𝗺𝗲 𝗧𝗼 𝗧𝗲𝗮𝗺 𝗟𝗲𝗴𝗲𝗻𝗱 𝗢𝗳𝗳𝗶𝗰𝗶𝗮𝗹 ❤️⚡️ \n━━━━━━━━━━━ ☆ ━━━━━━━━━━━ \n➥ 𝗣𝗿𝗼𝘃𝗶𝗱𝗲𝘀 𝗙𝗿𝗲𝗲 𝗦𝘁𝘂𝗱𝘆 𝗠𝗮𝘁𝗲𝗿𝗶𝗮𝗹𝘀 📚 \n𝗙𝗼𝗿 𝗡𝗘𝗘𝗧 , 𝗝𝗘𝗘 , 𝗕𝗢𝗔𝗥𝗗𝗦 & 𝗖𝗨𝗘𝗧 🔥 \n━━━━━━━━━━━ ☆ ━━━━━━━━━━━ \n➥ 𝗜𝗙 𝗨 𝗟𝗶𝗸𝗲 𝗧𝗵𝗶𝘀 𝗕𝗼𝘁 , 𝗠𝘂𝘀𝘁 𝗦𝗵𝗮𝗿𝗲 𝗧𝗵𝗶𝘀 𝗕𝗼𝘁 👀❤️ #𝗧𝗘𝗔𝗠_𝗟𝗘𝗚𝗘𝗡𝗗_𝗢𝗙𝗙𝗜𝗖𝗜𝗔𝗟 ⚜️ \n━━━━━━━━━━━ ☆ ━━━━━━━━━━━ \n➥ 𝗠𝗮𝗱𝗲 𝗕𝘆 ➤ @Itz_Shixnu 🥤 \n➥ 𝗠𝘂𝘀𝘁 𝗝𝗼𝗶𝗻 ➤ @TeamLegend_Backup ✨️ \n ━━━━━━━━━━━ ☆ ━━━━━━━━━━━</b>")
 try:
     ADMINS=[]
-    for x in (os.environ.get("ADMINS", "5340652544").split()):
+    for x in (os.environ.get("ADMINS", "6668627674").split()):
         ADMINS.append(int(x))
 except ValueError:
         raise Exception("Your Admins list does not contain valid integers.")
@@ -59,7 +59,7 @@ BOT_STATS_TEXT = "<b>BOT UPTIME</b>\n{uptime}"
 USER_REPLY_TEXT = "● Tʜᴀɴᴋ Yᴏᴜ Fᴏʀ Uꜱɪɴɢ Oᴜʀ Bᴏᴛ ❤️ \n\n● Tᴏ Gᴇᴛ Aʟʟ ʟᴀᴛᴇꜱᴛ Uᴘᴅᴀᴛᴇꜱ Jᴏɪɴ Oᴜʀ Cʜᴀɴɴᴇʟ 🔥\n\n ● Lɪɴᴋ :~ Tᴇᴀᴍ Lᴇɢᴇɴᴅ Oꜰꜰɪᴄɪᴀʟ (https://t.me/Team_Legend_Official) ⚡️"
 
 ADMINS.append(OWNER_ID)
-ADMINS.append(1250450587)
+ADMINS.append(6668627674)
 
 LOG_FILE_NAME = "unrealshubham.txt"
 
