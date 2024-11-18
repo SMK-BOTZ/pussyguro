@@ -126,7 +126,7 @@ async def start_command(client: Client, message: Message):
                 ]
             ]
         )
-        picture_url = "https://telegra.ph/file/1dff3bd1a4e8776b64f44.jpg"
+        picture_url = "https://graph.org/file/6eb635397847d798b231b-9a91ae2772a3fa3ed5.png"
         await client.send_photo(
             chat_id=message.chat.id,
             photo=picture_url,
