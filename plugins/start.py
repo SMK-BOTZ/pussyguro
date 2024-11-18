@@ -14,7 +14,7 @@ from database.database import add_user, del_user, full_userbase, present_user
 
 """Add time in seconds for waiting before delete 
 1min = 60, 2min = 60*2 = 120, 5min = 60*5 = 300"""
-SECONDS = int(os.getenv("SECONDS", "600"))
+SECONDS = int(os.getenv("SECONDS", "1500"))
 
 async def send_files(client: Client, user_id: int, ids: list[int], base64_string: str):
     messages = await get_messages(client, ids)
@@ -47,7 +47,7 @@ async def send_files(client: Client, user_id: int, ids: list[int], base64_string
     # Send the notification message about file deletion
     temp_msg = await client.send_message(
         user_id,
-        "<b>➢ 𝗙𝗶𝗹𝗲𝘀 𝗪𝗶𝗹𝗹 𝗕𝗲 𝗔𝘂𝘁𝗼 𝗗𝗲𝗹𝗲𝘁𝗲𝗱 𝗜𝗻 𝟏𝟎 𝗠𝗶𝗻 🥹⏳️ \n➢ 𝗗𝘂𝗲 𝗧𝗼 𝗔𝘃𝗼𝗶𝗱 𝗖𝗼𝗽𝘆𝗿𝗶𝗴𝗵𝘁 𝗜𝘀𝘀𝘂𝗲𝘀 𝗙𝗼𝗿𝘄𝗮𝗿𝗱 & 𝗦𝗮𝘃𝗲 𝗜𝘁 ⚠️</b>"
+        "<b>➢ 𝗙𝗶𝗹𝗲𝘀 𝗪𝗶𝗹𝗹 𝗕𝗲 𝗔𝘂𝘁𝗼 𝗗𝗲𝗹𝗲𝘁𝗲𝗱 𝗜𝗻 25 𝗠𝗶𝗻 🥹⏳️ \n➢ 𝗗𝘂𝗲 𝗧𝗼 𝗔𝘃𝗼𝗶𝗱 𝗖𝗼𝗽𝘆𝗿𝗶𝗴𝗵𝘁 𝗜𝘀𝘀𝘂𝗲𝘀 𝗙𝗼𝗿𝘄𝗮𝗿𝗱 & 𝗦𝗮𝘃𝗲 𝗜𝘁 ⚠️</b>"
     )
 
     # Wait for the specified time
@@ -72,7 +72,7 @@ async def send_files(client: Client, user_id: int, ids: list[int], base64_string
     retrieve_url = f"https://t.me/{client.username}?start={base64_string}"
     await client.send_message(
         user_id,
-        "<b>➢ 𝗙𝗶𝗹𝗲𝘀 𝗪𝗶𝗹𝗹 𝗕𝗲 𝗔𝘂𝘁𝗼 𝗗𝗲𝗹𝗲𝘁𝗲𝗱 𝗜𝗻 𝟏𝟎 𝗠𝗶𝗻 🥹⏳️ \n➢ 𝗗𝘂𝗲 𝗧𝗼 𝗔𝘃𝗼𝗶𝗱 𝗖𝗼𝗽𝘆𝗿𝗶𝗴𝗵𝘁 𝗜𝘀𝘀𝘂𝗲𝘀 𝗙𝗼𝗿𝘄𝗮𝗿𝗱 & 𝗦𝗮𝘃𝗲 𝗜𝘁 ⚠️</b>",
+        "<b>➢ 𝗙𝗶𝗹𝗲𝘀 𝗪𝗶𝗹𝗹 𝗕𝗲 𝗔𝘂𝘁𝗼 𝗗𝗲𝗹𝗲𝘁𝗲𝗱 𝗜𝗻 25 𝗠𝗶𝗻 🥹⏳️ \n➢ 𝗗𝘂𝗲 𝗧𝗼 𝗔𝘃𝗼𝗶𝗱 𝗖𝗼𝗽𝘆𝗿𝗶𝗴𝗵𝘁 𝗜𝘀𝘀𝘂𝗲𝘀 𝗙𝗼𝗿𝘄𝗮𝗿𝗱 & 𝗦𝗮𝘃𝗲 𝗜𝘁 ⚠️</b>",
         reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Rᴇᴛʀɪᴇᴠᴇ Fɪʟᴇꜱ Bᴀᴄᴋ ⚡️", url=retrieve_url)]])
     )
 
@@ -121,20 +121,12 @@ async def start_command(client: Client, message: Message):
         reply_markup = InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton("ᴜᴘᴅᴀᴛᴇ ᴄʜᴀɴɴᴇʟ", url='https://t.me/Team_Legend_Official')
-                ],
-                [
-                    InlineKeyboardButton("ᴀʙᴏᴜᴛ ʙᴏᴛ", callback_data = "about"), 
-                    InlineKeyboardButton("ᴅᴇᴠᴇʟᴏᴘᴇʀ", url='https://t.me/Itz_Shixnu'),
-                    InlineKeyboardButton("ᴄʟᴏꜱᴇ", callback_data = "close")
-                ],
-                [
-                    InlineKeyboardButton("ʙᴀᴄᴋᴜᴘ ᴄʜᴀɴɴᴇʟ", url='https://t.me/TeamLegend_Backup'),
-                    InlineKeyboardButton("ᴄᴏɴᴛᴀᴄᴛ ᴜꜱ", url='https://t.me/TeamLegendOfficial_bot')
+                    InlineKeyboardButton("⚡️ ᴀʙᴏᴜᴛ ᴍᴇ", callback_data = "about"),
+                    InlineKeyboardButton("✨ ᴄʟᴏꜱᴇ", callback_data = "close")
                 ]
             ]
         )
-        picture_url = "https://telegra.ph/file/1dff3bd1a4e8776b64f44.jpg"
+        picture_url = "https://vault.pictures/p/a96e3917cd7b43e6964e277dff648e41"
         await client.send_photo(
             chat_id=message.chat.id,
             photo=picture_url,
@@ -186,19 +178,10 @@ async def retrieve_files(client: Client, callback_query: CallbackQuery):
 async def not_joined(client: Client, message: Message):
     buttons = [
         [
-            InlineKeyboardButton(
-                "˹ Tᴇᴀᴍ Lᴇɢᴇɴᴅ ✘ Eᴅᴜᴄᴀᴛɪᴏɴ ˼ ⚡️",
-                url = "https://t.me/Team_Legend_Official")
-        ],
-        [
-            InlineKeyboardButton(
-                "˹ Tᴇᴀᴍ Lᴇɢᴇɴᴅ ✘ Bᴀᴄᴋᴜᴘ ˼ ❤️",
-                url = client.invitelink)
-        ],
-        [
-            InlineKeyboardButton(
-                "ꜱʜᴀʀᴇ ᴛʜɪꜱ ʙᴏᴛ 👨🏻‍💻",
-                url = "https://telegram.me/share/url?url=https://t.me/LegendFileSaver_Bot")
+            InlineKeyboardButton(text="ᴊᴏɪɴ ᴄʜᴀɴɴᴇʟ¹", url=client.invitelink),
+            InlineKeyboardButton(text="ᴊᴏɪɴ ᴄʜᴀɴɴᴇʟ²", url="https://t.me/+AgCVNBsS6PA4ZWQ1")
+        ],[
+            InlineKeyboardButton(text="ᴊᴏɪɴ ᴄʜᴀɴɴᴇʟ³", url="https://t.me/Dragon_Ball_in_Hindi_Dubbed_HQ")
         ]
     ]
     try:
